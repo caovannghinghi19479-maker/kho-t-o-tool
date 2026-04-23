@@ -18,9 +18,17 @@ export interface WorkflowRunRecord {
 }
 
 const workerBase = process.env.WORKER_URL ?? 'http://127.0.0.1:8001';
-const backendBase =
-  process.env.BACKEND_URL ??
-  `http://127.0.0.1:${process.env.BACKEND_PORT ?? process.env.PORT ?? '8787'}`;
+const resolveBackendBase = (): string => {
+  if (process.env.BACKEND_URL) {
+    return process.env.BACKEND_URL;
+  }
+
+  const backendPort = process.env.BACKEND_PORT ?? process.env.PORT ?? '8787';
+  const backendHost = process.env.BACKEND_HOST ?? '127.0.0.1';
+  return `http://${backendHost}:${backendPort}`;
+};
+
+const backendBase = resolveBackendBase();
 
 const postJson = async <T>(url: string, body: unknown): Promise<T> => {
   const response = await fetch(url, {
@@ -73,7 +81,7 @@ export class WorkflowEngine {
       output.transcription = transcription;
 
       record.step = 'Create';
-      record.logs.push('Create: generating rewritten script, storyboard, and prompts');
+      record.logs.push(`Create: generating rewritten script, storyboard, and prompts via ${backendBase}`);
       const transcript = String(transcription.text ?? research.transcript_hint ?? '');
 
       const scriptResp = await postJson<Record<string, unknown>>(`${backendBase}/api/creative/script`, {
