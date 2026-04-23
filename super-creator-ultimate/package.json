@@ -1,0 +1,18 @@
+{
+  "name": "super-creator-ultimate",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.12.3",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "turbo run format",
+    "postinstall": "turbo run prisma:generate --filter=@supercreator/backend"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.12",
+    "typescript": "^5.6.3"
+  }
+}
