@@ -1,0 +1,26 @@
+appId: com.supercreator.tool
+productName: SuperCreatorTool
+artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
+directories:
+  output: release
+files:
+  - apps/electron/dist/**
+  - apps/renderer/dist/**
+  - apps/server/dist/**
+  - workers/**
+  - package.json
+  - "!**/*.map"
+  - "!**/*.ts"
+  - "!**/__pycache__/**"
+extraResources:
+  - from: workers
+    to: workers
+win:
+  target:
+    - nsis
+mac:
+  target:
+    - dmg
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true

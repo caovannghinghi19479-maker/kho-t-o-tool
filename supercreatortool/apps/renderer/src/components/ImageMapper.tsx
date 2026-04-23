@@ -1,0 +1,3 @@
+export default function ImageMapper({ items, onChange }: { items: { imagePath: string; prompt: string }[]; onChange: (items: { imagePath: string; prompt: string }[]) => void }) {
+  return <div className="space-y-2">{items.map((it, i) => <div key={i} className="grid grid-cols-2 gap-2"><input value={it.imagePath} onChange={(e)=>onChange(items.map((x,idx)=>idx===i?{...x,imagePath:e.target.value}:x))} className="bg-slate-900 border border-slate-800 p-2 rounded" /><input value={it.prompt} onChange={(e)=>onChange(items.map((x,idx)=>idx===i?{...x,prompt:e.target.value}:x))} className="bg-slate-900 border border-slate-800 p-2 rounded" /></div>)}</div>;
+}

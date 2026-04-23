@@ -1,0 +1,28 @@
+{
+  "name": "supercreatortool",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/electron",
+    "apps/renderer",
+    "apps/server"
+  ],
+  "scripts": {
+    "dev": "concurrently -k \"npm:dev:server\" \"npm:dev:renderer\" \"npm:dev:electron\"",
+    "dev:server": "npm --workspace apps/server run dev",
+    "dev:renderer": "npm --workspace apps/renderer run dev",
+    "dev:electron": "npm --workspace apps/electron run dev",
+    "build": "npm run build:renderer && npm run build:server && npm run build:electron",
+    "build:renderer": "npm --workspace apps/renderer run build",
+    "build:server": "npm --workspace apps/server run build",
+    "build:electron": "npm --workspace apps/electron run build",
+    "prisma:generate": "npm --workspace apps/server run prisma:generate",
+    "prisma:migrate": "npm --workspace apps/server run prisma:migrate",
+    "package:sanity": "node scripts/package-sanity.mjs",
+    "dist": "npm run build && npm run package:sanity && electron-builder -c electron-builder.yml"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "electron-builder": "^25.1.8"
+  }
+}
