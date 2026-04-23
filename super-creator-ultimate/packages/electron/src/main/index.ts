@@ -5,6 +5,7 @@ import log from 'electron-log';
 import { BrowserManager } from './browserManager';
 import { registerIpcHandlers } from './ipcHandlers';
 import { ServerManager } from './serverManager';
+import { dataPaths, ensureDataDirectories } from './dataPaths';
 
 let mainWindow: BrowserWindow | null = null;
 let splashWindow: BrowserWindow | null = null;
@@ -54,6 +55,8 @@ const setupAutoUpdater = (): void => {
 };
 
 app.whenReady().then(async () => {
+  ensureDataDirectories();
+  app.setPath('userData', dataPaths.electronUserDataDir);
   createSplashWindow();
   registerIpcHandlers(browserManager);
   setupAutoUpdater();

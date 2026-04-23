@@ -1,41 +1,47 @@
+import { runGeminiText } from './geminiClient';
+
 export interface ScriptWriterInput {
   sourceTranscript: string;
   angle: string;
   tone: string;
+  targetSeconds?: number;
 }
 
-const geminiCall = async (prompt: string): Promise<string> => {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return `Improved script (local fallback): ${prompt.slice(0, 240)}...`;
-  }
+const localRewrite = (input: ScriptWriterInput): string => {
+  const sentences = input.sourceTranscript
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    }
-  );
+  const opener = `Hook (${input.tone}): ${sentences[0] ?? 'Start with a punchy claim about the topic.'}`;
+  const body = sentences.slice(1, 7).map((s, idx) => `Point ${idx + 1}: ${s}`).join('\n');
+  const cta = 'CTA: Ask viewers to comment their biggest challenge and subscribe for the next part.';
+  const pacing = `Pacing: Keep total runtime near ${input.targetSeconds ?? 45} seconds.`;
 
-  if (!response.ok) {
-    throw new Error(`Gemini request failed: ${response.status}`);
-  }
-
-  const data = (await response.json()) as any;
-  return data?.candidates?.[0]?.content?.parts?.[0]?.text ?? 'No script returned from Gemini.';
+  return [
+    `Angle: ${input.angle}`,
+    opener,
+    body,
+    cta,
+    pacing
+  ].filter(Boolean).join('\n\n');
 };
 
 export const rewriteScript = async (input: ScriptWriterInput): Promise<string> => {
   const prompt = [
-    'Rewrite this competitor transcript into an original and stronger script.',
-    `Angle: ${input.angle}`,
-    `Tone: ${input.tone}`,
-    'Keep core information value but change structure, phrasing, examples, and pacing.',
-    'Return plain script only.',
-    `Transcript:\n${input.sourceTranscript}`
-  ].join('\n\n');
+    'You are a professional short-form video script doctor.',
+    'Rewrite the source transcript into an original script suitable for voiceover.',
+    `Desired angle: ${input.angle}`,
+    `Desired tone: ${input.tone}`,
+    `Target runtime: ${input.targetSeconds ?? 45} seconds`,
+    'Rules:',
+    '- Keep core factual meaning but rewrite structure and language.',
+    '- Include: Hook, Value sequence, and CTA.',
+    '- Return plain text only, no markdown.',
+    'Source transcript:',
+    input.sourceTranscript
+  ].join('\n');
 
-  return geminiCall(prompt);
+  const generated = await runGeminiText(prompt, 0.8);
+  return generated ?? localRewrite(input);
 };

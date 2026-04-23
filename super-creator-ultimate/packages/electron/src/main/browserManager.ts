@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { app } from 'electron';
 import { chromium, BrowserContext, Cookie } from 'playwright';
+import { dataPaths } from './dataPaths';
 
 export interface BrowserProfileConfig {
   profileId: string;
@@ -19,7 +19,7 @@ export class BrowserManager {
   private profiles = new Map<string, ManagedProfile>();
 
   private getProfileDir(profileId: string): string {
-    const profileDir = path.join(app.getPath('userData'), 'profiles', profileId);
+    const profileDir = path.join(dataPaths.browserProfilesDir, profileId);
     fs.mkdirSync(profileDir, { recursive: true });
     return profileDir;
   }

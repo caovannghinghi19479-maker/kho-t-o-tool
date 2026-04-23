@@ -1,5 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'node:child_process';
 import path from 'node:path';
+import { dataPaths } from './dataPaths';
 
 export interface ServerState {
   backendReady: boolean;
@@ -21,7 +22,8 @@ export class ServerManager {
       stdio: 'pipe',
       env: {
         ...process.env,
-        PORT: process.env.BACKEND_PORT ?? '8787'
+        PORT: process.env.BACKEND_PORT ?? '8787',
+        SUPER_CREATOR_DATA_DIR: dataPaths.baseDir
       }
     });
 
@@ -35,7 +37,9 @@ export class ServerManager {
       stdio: 'pipe',
       env: {
         ...process.env,
-        WORKER_PORT: process.env.WORKER_PORT ?? '8001'
+        WORKER_PORT: process.env.WORKER_PORT ?? '8001',
+        SUPER_CREATOR_DATA_DIR: dataPaths.baseDir,
+        WHISPER_MODEL_DIR: dataPaths.whisperModelsDir
       }
     });
 

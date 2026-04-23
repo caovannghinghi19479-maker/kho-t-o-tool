@@ -3,10 +3,11 @@ from __future__ import annotations
 import json
 import os
 import subprocess
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+from services.data_paths import make_temp_dir
 
 
 @dataclass
@@ -27,15 +28,15 @@ def fetch_metadata(url: str) -> dict[str, Any]:
 
 
 def download_video_audio(url: str) -> tuple[str, str]:
-    output_dir = tempfile.mkdtemp(prefix="sct-yt-")
-    video_template = os.path.join(output_dir, "video.%(ext)s")
-    audio_template = os.path.join(output_dir, "audio.%(ext)s")
+    output_dir = make_temp_dir("sct-yt")
+    video_template = os.path.join(str(output_dir), "video.%(ext)s")
+    audio_template = os.path.join(str(output_dir), "audio.%(ext)s")
 
     subprocess.run(["yt-dlp", "-f", "mp4/best", "-o", video_template, url], check=True, capture_output=True, text=True)
     subprocess.run(["yt-dlp", "-f", "bestaudio", "-o", audio_template, url], check=True, capture_output=True, text=True)
 
-    video_files = list(Path(output_dir).glob("video.*"))
-    audio_files = list(Path(output_dir).glob("audio.*"))
+    video_files = list(output_dir.glob("video.*"))
+    audio_files = list(output_dir.glob("audio.*"))
     if not video_files or not audio_files:
         raise RuntimeError("yt-dlp download failed")
     return str(video_files[0]), str(audio_files[0])
