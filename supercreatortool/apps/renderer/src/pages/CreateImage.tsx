@@ -1,0 +1,3 @@
+import { useState } from "react";
+import { api } from "../lib/api";
+export default function CreateImage(){const [projectId,setProjectId]=useState('');const [prompts,setPrompts]=useState('');return <div className='space-y-3'><h2 className='text-2xl font-bold'>Create Image</h2><input className='bg-slate-900 border border-slate-800 p-2 rounded' value={projectId} onChange={(e)=>setProjectId(e.target.value)} placeholder='Project ID'/><textarea className='w-full h-40 bg-slate-900 border border-slate-800 p-2 rounded' value={prompts} onChange={(e)=>setPrompts(e.target.value)}/><button className='bg-violet-600 px-3 py-2 rounded' onClick={()=>api.post('/create-image',{projectId,prompts:prompts.split('\n').filter(Boolean),model:'imagen-3'})}>Generate Images</button></div>}

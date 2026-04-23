@@ -1,0 +1,1 @@
+export default function ThumbnailStudio(){return <div><h2 className='text-2xl font-bold mb-2'>Thumbnail Studio</h2><p className='text-slate-400'>Review thumbnail concepts and export polished prompt sets.</p></div>}

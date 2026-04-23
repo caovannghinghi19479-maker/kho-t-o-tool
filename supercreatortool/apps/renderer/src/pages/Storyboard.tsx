@@ -1,0 +1,1 @@
+export default function Storyboard(){return <div><h2 className='text-2xl font-bold mb-2'>Storyboard</h2><p className='text-slate-400'>Use this area to organize generated scenes and continuity notes.</p></div>}

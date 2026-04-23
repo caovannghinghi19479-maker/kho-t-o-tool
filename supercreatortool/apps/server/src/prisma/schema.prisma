@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  jobs        Job[]
+  artifacts   Artifact[]
+}
+
+model Job {
+  id         String   @id @default(uuid())
+  projectId  String
+  project    Project  @relation(fields: [projectId], references: [id])
+  type       String
+  status     String   @default("pending")
+  prompt     String?
+  inputData  String?
+  outputData String?
+  error      String?
+  progress   Int      @default(0)
+  retryCount Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Artifact {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  type      String
+  filePath  String
+  metadata  String?
+  createdAt DateTime @default(now())
+}
+
+model Settings {
+  id            String   @id @default("singleton")
+  geminiApiKey  String   @default("")
+  outputDir     String   @default("")
+  defaultModel  String   @default("veo-3")
+  defaultAspect String   @default("16:9")
+  maxRetries    Int      @default(3)
+  maxConcurrent Int      @default(2)
+  proxyList     String   @default("")
+  pythonPath    String   @default("python")
+  updatedAt     DateTime @updatedAt
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?
+  platform  String
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+}
