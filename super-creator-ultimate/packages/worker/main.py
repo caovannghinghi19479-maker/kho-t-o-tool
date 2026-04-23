@@ -9,6 +9,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, HttpUrl
 
 from services.gemini_service import GeminiService
+from services.data_paths import ensure_worker_dirs
 from services.media_analyzer import CompetitorAnalysisResult, MediaAnalyzer
 from services.post.concat import concat_videos
 from services.post.exporter import export_video
@@ -52,6 +53,7 @@ class BurnSubtitlesRequest(BaseModel):
 class ConcatRequest(BaseModel):
     video_paths: list[str]
     output_path: Optional[str] = None
+    transition: str = "none"
 
 
 class ExportRequest(BaseModel):
@@ -63,6 +65,7 @@ class ExportRequest(BaseModel):
 
 @app.on_event("startup")
 def startup_check() -> None:
+    ensure_worker_dirs()
     if shutil.which("ffmpeg") is None:
         raise RuntimeError("ffmpeg is required in PATH for worker startup.")
 
@@ -144,7 +147,7 @@ def worker_burn_subtitles(payload: BurnSubtitlesRequest) -> dict:
 @app.post("/worker/post/concat")
 def worker_concat(payload: ConcatRequest) -> dict:
     try:
-        output = concat_videos(payload.video_paths, payload.output_path)
+        output = concat_videos(payload.video_paths, payload.output_path, payload.transition)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     return {"output_path": output}

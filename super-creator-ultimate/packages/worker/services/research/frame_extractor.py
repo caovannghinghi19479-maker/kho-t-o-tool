@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 import os
-import tempfile
 from typing import Any
 
 import cv2
 import numpy as np
 
+from services.data_paths import make_temp_dir
+
 
 def extract_scene_keyframes(video_path: str, threshold: float = 22.0) -> dict[str, Any]:
     capture = cv2.VideoCapture(video_path)
-    output_dir = tempfile.mkdtemp(prefix="sct-keyframes-")
+    output_dir = make_temp_dir("sct-keyframes")
 
     prev_gray = None
     frame_idx = 0
@@ -27,11 +28,11 @@ def extract_scene_keyframes(video_path: str, threshold: float = 22.0) -> dict[st
             diff = float(np.mean(cv2.absdiff(gray, prev_gray)))
             diffs.append(diff)
             if diff >= threshold:
-                path = os.path.join(output_dir, f"scene_{frame_idx}.jpg")
+                path = os.path.join(str(output_dir), f"scene_{frame_idx}.jpg")
                 cv2.imwrite(path, frame)
                 saved.append(path)
         elif frame_idx == 0:
-            path = os.path.join(output_dir, "scene_0.jpg")
+            path = os.path.join(str(output_dir), "scene_0.jpg")
             cv2.imwrite(path, frame)
             saved.append(path)
 

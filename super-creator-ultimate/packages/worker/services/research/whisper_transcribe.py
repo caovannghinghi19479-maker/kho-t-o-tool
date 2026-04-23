@@ -4,6 +4,8 @@ from typing import Any
 
 from faster_whisper import WhisperModel
 
+from services.data_paths import WHISPER_MODELS_DIR
+
 
 _MODEL: WhisperModel | None = None
 
@@ -11,7 +13,7 @@ _MODEL: WhisperModel | None = None
 def _get_model() -> WhisperModel:
     global _MODEL
     if _MODEL is None:
-        _MODEL = WhisperModel("base", device="cpu", compute_type="int8")
+        _MODEL = WhisperModel("base", device="cpu", compute_type="int8", download_root=str(WHISPER_MODELS_DIR))
     return _MODEL
 
 

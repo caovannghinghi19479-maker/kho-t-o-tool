@@ -90,6 +90,17 @@ pnpm build
 pnpm dist
 ```
 
+
+## Data directory policy
+
+The runtime now defaults to `E:/SuperCreatorData` for all heavy and transient data.
+
+- Electron userData: `E:/SuperCreatorData/electron-userdata`
+- Browser profiles: `E:/SuperCreatorData/browser-profiles`
+- Worker media/temp/logs/model cache: under `E:/SuperCreatorData/{media,temp,logs,whisper-models}`
+
+Override with `SUPER_CREATOR_DATA_DIR` when required.
+
 ## Notes
 
 - Browser automation services in backend are intentionally safe placeholder flows.
