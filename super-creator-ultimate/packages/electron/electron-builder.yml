@@ -1,0 +1,21 @@
+appId: com.supercreator.ultimate
+productName: SuperCreatorUltimate
+files:
+  - dist/**
+  - package.json
+asar: true
+directories:
+  output: release
+  buildResources: assets
+win:
+  target:
+    - nsis
+mac:
+  target:
+    - dmg
+linux:
+  target:
+    - AppImage
+publish:
+  provider: generic
+  url: https://example.com/downloads
