@@ -18,6 +18,9 @@ export interface WorkflowRunRecord {
 }
 
 const workerBase = process.env.WORKER_URL ?? 'http://127.0.0.1:8001';
+const backendBase =
+  process.env.BACKEND_URL ??
+  `http://127.0.0.1:${process.env.BACKEND_PORT ?? process.env.PORT ?? '8787'}`;
 
 const postJson = async <T>(url: string, body: unknown): Promise<T> => {
   const response = await fetch(url, {
@@ -73,15 +76,15 @@ export class WorkflowEngine {
       record.logs.push('Create: generating rewritten script, storyboard, and prompts');
       const transcript = String(transcription.text ?? research.transcript_hint ?? '');
 
-      const scriptResp = await postJson<Record<string, unknown>>('http://127.0.0.1:8787/api/creative/script', {
+      const scriptResp = await postJson<Record<string, unknown>>(`${backendBase}/api/creative/script`, {
         sourceTranscript: transcript,
         angle: input.angle ?? 'educational',
         tone: input.tone ?? 'engaging',
         targetSeconds: input.targetSeconds ?? 45
       });
       const script = String(scriptResp.script ?? '');
-      const storyboardResp = await postJson<Record<string, unknown>>('http://127.0.0.1:8787/api/creative/storyboard', { script });
-      const promptsResp = await postJson<Record<string, unknown>>('http://127.0.0.1:8787/api/creative/prompts', {
+      const storyboardResp = await postJson<Record<string, unknown>>(`${backendBase}/api/creative/storyboard`, { script });
+      const promptsResp = await postJson<Record<string, unknown>>(`${backendBase}/api/creative/prompts`, {
         scenes: storyboardResp.scenes ?? []
       });
 
@@ -102,11 +105,11 @@ export class WorkflowEngine {
         crf: 20
       });
 
-      const titleResp = await postJson<Record<string, unknown>>('http://127.0.0.1:8787/api/youtube/title', {
+      const titleResp = await postJson<Record<string, unknown>>(`${backendBase}/api/youtube/title`, {
         topic: input.topic ?? 'AI video production',
         hook: 'Watch before you publish'
       });
-      const descriptionResp = await postJson<Record<string, unknown>>('http://127.0.0.1:8787/api/youtube/description', {
+      const descriptionResp = await postJson<Record<string, unknown>>(`${backendBase}/api/youtube/description`, {
         title: String(titleResp.title ?? input.topic ?? 'Video'),
         script
       });
