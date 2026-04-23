@@ -18,9 +18,15 @@ export interface WorkflowRunRecord {
 }
 
 const workerBase = process.env.WORKER_URL ?? 'http://127.0.0.1:8001';
-const backendBase =
-  process.env.BACKEND_URL ??
-  `http://127.0.0.1:${process.env.BACKEND_PORT ?? process.env.PORT ?? '8787'}`;
+
+const getBackendBase = (): string => {
+  if (process.env.BACKEND_URL) {
+    return process.env.BACKEND_URL;
+  }
+
+  const backendPort = process.env.BACKEND_PORT ?? process.env.PORT ?? '8787';
+  return `http://127.0.0.1:${backendPort}`;
+};
 
 const postJson = async <T>(url: string, body: unknown): Promise<T> => {
   const response = await fetch(url, {
@@ -54,6 +60,7 @@ export class WorkflowEngine {
 
   private async runPipeline(record: WorkflowRunRecord, input: WorkflowRunInput): Promise<void> {
     const output: Record<string, unknown> = {};
+    const backendBase = getBackendBase();
     record.status = 'running';
 
     try {
